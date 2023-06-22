@@ -1,0 +1,26 @@
+The code starts with a loop that iterates over a range of values from 0 to args.add_fc + 2. This loop variable is denoted as l.
+
+Within the loop, the size of the loss is determined as the minimum of the sizes of feat_source[l] and feat_target[l]. This is done using the min function.
+
+A variable named total_fc_L2norm_loss is initialized to zero.
+
+The code selects a subset of feat_source and feat_target based on the determined size loss. This subset is stored in feat_source_sel and feat_target_sel, respectively.
+
+To avoid memory issues, the selected subsets are divided into smaller batches. The batch size is determined as the minimum of 256 and the size of feat_source_sel. The subsets are reshaped using the view function to have a shape of (-1, size_batch, feat_dim).
+
+The size loss is recalculated based on the reshaped subsets, and a nested loop is started that iterates over the range of size_loss.
+
+Within the nested loop, two functions, get_L2norm_loss_self_driven, are called to calculate L2-norm losses for feat_source_sel[t] and feat_target_sel[t], respectively. The results are stored in s_fc2_L2norm_loss and t_fc2_L2norm_loss.
+
+A local loss value, local_fc_L2norm_loss, is calculated as the sum of s_fc2_L2norm_loss and t_fc2_L2norm_loss.
+
+The local loss is accumulated into the total_fc_L2norm_loss variable.
+
+After the nested loop, the total_fc_L2norm_loss is divided by size_loss to calculate the average L2-norm loss.
+
+Finally, the average L2-norm loss is added to loss_classification.
+
+
+get_L2norm_loss_self_driven(x): This function calculates the L2-norm loss for a given input x. It involves a weight factor, weight_L2norm, and the radius of x computed using its L2-norm. The radius is increased by 1.0, and the loss is computed as the mean square difference between the L2-norm of x and the adjusted radius. The loss is multiplied by weight_L2norm before being returned.
+
+MCC_entropy(input_): This function computes the entropy of the input tensor input_. It first determines the batch size (bs). Then, a small epsilon value is added to the input tensor to avoid numerical instability. The entropy is calculated as the element-wise multiplication of the input tensor with the natural logarithm of the input tensor plus epsilon. The resulting tensor is summed along the second dimension (dimension 1), representing the sum of entropies for each example in the batch. The computed entropy values are returned.
